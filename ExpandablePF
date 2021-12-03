@@ -1,0 +1,7 @@
+                R PF001                  
+                  DESG_ID        3S 0    
+                  EMP_ID         3S 0    
+                  EMP_NAME      10A      
+                  EMP_SLRY      05S 0    
+                K EMP_ID                 
+                K DESG_ID                
