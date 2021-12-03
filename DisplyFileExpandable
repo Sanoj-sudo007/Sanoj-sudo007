@@ -1,0 +1,61 @@
+A*%%TS  SD  20201201  082025  VIRAG       REL-V7R4M0  5770-WDS
+A*%%EC                                                        
+A                                      DSPSIZ(24 80 *DS3)     
+A                                      PAGEDOWN(66)           
+A          R SFL01                     SFL                    
+A*%%TS  SD  20201201  082025  VIRAG       REL-V7R4M0  5770-WDS
+A  40                                  SFLNXTCHG              
+A            S1EMPID        3S 0O 10 14                       
+A            S1EMPNAME     10A  O 10 19                       
+A            S1EMPSLRY      5Y 0O 10 31EDTCDE(2)              
+A            S1OPT          1A  I 10  3                       
+A            S1DESGID       3S 0O 10  8                       
+A*                                                            
+A          R SFLCTL01                  SFLCTL(SFL01)          
+A*%%TS  SD  20201201  082025  VIRAG       REL-V7R4M0  5770-WDS
+A                                      SFLSIZ(0005)           
+A                                      SFLPAG(0004)           
+A                                      CA03(03 'EXIT')        
+A                                      CA17(17 'POSTION')     
+A                                      CA10(10 'TOGGLE')           
+A                                      OVERLAY                     
+A  50                                  SFLDSP                      
+A  51                                  SFLDSPCTL                   
+A  52                                  SFLCLR                      
+A  53                                  SFLEND(*MORE)               
+A                                  1  3USER                        
+A                                  1 72DATE                        
+A                                      EDTCDE(Y)                   
+A                                  1 33'EMPLYOEE DETAILS'          
+A                                      DSPATR(HI)                  
+A                                      DSPATR(UL)                  
+A                                  8  3'OPT'                       
+A                                      DSPATR(HI)                  
+A                                  8 31'EMPLOYEE'                  
+A                                      DSPATR(HI)                  
+A                                  9 19'NAME'                      
+A                                      DSPATR(HI)                  
+A                                  5  3'TYPE OPTIONS, PRESS ENTER.'
+A                                      COLOR(BLU)                  
+A                                  6  3'2=UPDATE   4=DELETE'    
+A                                      COLOR(BLU)               
+A                                  8  8'DESG'                   
+A                                      DSPATR(HI)               
+A                                  9 14'ID'                     
+A                                      DSPATR(HI)               
+A                                  8 14'EMP'                    
+A                                      DSPATR(HI)               
+A                                  9  8'ID'                     
+A                                      DSPATR(HI)               
+A                                  8 19'EMPLOYEE'               
+A                                      DSPATR(HI)               
+A                                  9 31'SALARY'                 
+A                                      DSPATR(HI)               
+A                                  3  3'POSITION TO BY DESG ID:'
+A                                      DSPATR(HI)               
+A            S1POS          3S 0I  3 27DSPATR(HI)               
+A          R FOOTER                                             
+A*%%TS  SD  20201110  024734  VIRAG       REL-V7R4M0  5770-WDS  
+A                                 23  3'F3=EXIT'                
+A                                      COLOR(BLU)               
+A            FLD001        70   O 24  3COLOR(RED)               
