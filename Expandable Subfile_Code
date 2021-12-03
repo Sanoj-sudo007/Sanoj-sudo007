@@ -1,0 +1,134 @@
+        Ctl-Opt Option(*NoDebugIO :*SrcStmt :*NounRef);             
+    // *?--------------------------------------------------------*  
+    // *?File Declaration                                        *  
+    // *?--------------------------------------------------------*  
+         Dcl-F DSPLEX1  WorkStn Sfile(Sfl01:rrn);                   
+         Dcl-F Pf001A keyed;                                        
+                                                                    
+    // *?--------------------------------------------------------*  
+    // *?Standalone Variable Declaration                         *  
+    // *?--------------------------------------------------------*  
+         Dcl-S EofFlg char(1) Inz('N');                             
+         Dcl-S First_Rec packed(3);                                 
+         Dcl-S rrn packed(4);                                       
+         Dcl-S counter packed(2);                                   
+                                                                    
+     //*?--------------------------------------------------------*  
+    // *?Constant Variable Declaration                           *  
+    // *?--------------------------------------------------------*  
+         Dcl-C Sflsize Const(4);                                    
+                                                                   
+     //*?--------------------------------------------------------* 
+    // *?Start Program Start                                     * 
+    // *?--------------------------------------------------------* 
+          ExSr MainPgm;                                            
+          ExSr Exit;                                               
+                                                                   
+    // *?--------------------------------------------------------* 
+    // *?Main Program Subroutine                                 * 
+    // *?--------------------------------------------------------* 
+         BegSr MainPgm;                    
+            Setll *loval Pf001A;           
+            ExSr ClearSfl;                 
+            ExSr LoadSfl;                  
+            Dow *In03 = *Off;              
+               ExSr DspSfl;                
+               ExSr Process;               
+            EndDo;                         
+         EndSr;                            
+     // *?--------------------------------------------------------* 
+     // *?Process Program Subroutine                              * 
+     // *?--------------------------------------------------------* 
+                                                                    
+           BegSr Process;                                           
+              Select;                                               
+                 When *In03 = *On;                                  
+                    ExSr Exit;                                      
+                 When *In66 = *On;                                  
+                   If EofFlg = 'N';                                 
+                      ExSr LoadSfl;         
+                      *In66 = *Off;         
+                   EndIf;                   
+                                            
+                 Other;                     
+                    If S1Pos <> 0 ;         
+                       Setll S1Pos Pf001a;  
+                       ExSr ClearSfl;       
+                       ExSr LoadSfl;        
+                       EofFlg = 'N';        
+                    EndIf;                                          
+              EndSl;                                                
+           EndSr;                                                   
+                                                                    
+     //  *?--------------------------------------------------------*
+     //  *?Clear Subfile Subroutine                                *
+     //  *?--------------------------------------------------------*
+                                                                    
+           BegSr ClearSfl;                                          
+              *In52 = *On;                                          
+              Write SflCtl01;                                       
+              *In52 = *Off;                                         
+              Rrn = 0;                                              
+           EndSr;                                                   
+                                                                    
+     // *?--------------------------------------------------------* 
+     // *?Load Subfile Subroutine                                 * 
+     // *?--------------------------------------------------------* 
+         BegSr LoadSfl;                                             
+         Read Pf001a;                                               
+           Dow Not %Eof(Pf001A);        
+              S1DesgId   = Desg_Id;     
+              S1EmpId    = Emp_Id;      
+              S1EmpName  = Emp_Name;    
+              S1EmpSlry  = Emp_Slry;    
+              rrn = rrn +1;             
+                 If rrn =1 ;            
+                    First_rec = desg_id;
+                 EndIf;                 
+              Write Sfl01;              
+              Read Pf001A;              
+                 If rrn = Sflsize;      
+                    Leave;              
+                 EndIf;                 
+           EndDo;                       
+                                        
+           If %Eof(Pf001a);             
+              EofFlg = 'Y';             
+           Else;                        
+              Readp Pf001a;             
+           EndIf;                                                  
+                                                                   
+         EndSr;                                                    
+     //*?--------------------------------------------------------* 
+    // *?Display Subfile Subroutine                              * 
+     //*?--------------------------------------------------------* 
+                                                                   
+          BegSr DspSfl;                                            
+             If rrn > 0;                                           
+                *In50 = *On;                                       
+                *In51 = *On;                                       
+             If EofFlg = 'N';                                      
+                *In53 = *Off;                                      
+             Else;                                                 
+                *In53 = *On;                                       
+             EndIf;                                                
+             ElseIf EofFlg = 'Y';                                  
+                *In53 = *On;                                       
+             EndIf;                                                
+                If rrn = 0;                                        
+                   *In50 = *Off;                                    
+                EndIf;                                              
+            Write Footer;                                           
+            Exfmt SflCtl01;                                         
+         EndSr;                                                     
+                                                                    
+      //*?--------------------------------------------------------* 
+      //*?Exit Program Subroutine                                 * 
+     // *?--------------------------------------------------------* 
+                                                                    
+          BegSr Exit;                                               
+             *Inlr = *On;                                           
+             Return;                                                
+          EndSr;                                                    
+                                                                    
+     // *?--------------------------------------------------------* 
