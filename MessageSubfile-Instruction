@@ -1,0 +1,215 @@
+STEPS:
+----------------------------------------------------------------------------------------------------------------------
+Firstly Create a message Subfile by Typing Below Command                                                              |
+crtmsgf                                                                                                               |
+Then take F4 and put the message File name as well as Library Name and hit Enter                                      |
+or simply type below format name                                                                                      |
+Note: Here SANOJ is Library Name and MSGFTEST is message file name and CRTMSGF is command to create MSG File          |
+Syntax: CRTMSGF MSGF(LibraryName/MessageFileName)                                                                     |
+CRTMSGF MSGF(SANOJ/MSGFTEST)                                                                                          |
+                                                                                                                      |
+----------------------------------------------------------------------------------------------------------------------
+
+More About there terms That we use for API's
+
+Message Subfile
+Message Subfile:
+Message Subfiles (or Subfile Messages) are very useful for screens where it needs to display multiple messages to the user giving the flexibility to the user to view all the messages by taking PAGE DOWN/PAGE UP. 
+
+These messages can be sent using SNDPGMMSG in CL Program. And, RMVMSG can be used to clear these messages from the Message Queue. 
+
+Message Subfile would then load the messages from the Specified Program Message Queue and display them on the screen. 
+
+However, When we use RPG, it require writing CL Program to execute SNDPGMMSG & RMVMSG to Send or Remove Messages to/from the queue. 
+
+Below APIs become very useful to do the same from RPG program rather than having to create another program to do this. 
+
+QMHSNDPM - Send Program Message API.
+QMHRMVPM - Remove Program Message API.
+
+We will see how to create Message Subfile before going on to using these APIs to send the messages to Queue.
+
+When adding new Record Format in DSPF, Select the type as 'SFLMSG' (Subfile message record). This would prompt for 'Subfile control record' similar to Subfiles. 
+
+There are few Important Keywords to remember when it comes to Message Subfiles. 
+
+SFLMSGRCD - Specify the Line Number where the Message to be displayed on the screen.
+SFLPGMQ - Type the name of the field that contains the name of the program message queue. Variable used here needs to be assigned with the Program Name. 
+
+Other Subfile keywords (SFLDSP, SFLDSPCTL, SFLINZ, SFLPAG, SFLSIZ) to be defined similar to the usual subfiles. Click Here to see more about Subfile Keywords. 
+
+Below is the Sample code for Subfile Message (DSPF)
+
+Below is the Sample code for Subfile Message (DSPF)
+
+     A* Subfile Message  
+
+     A          R PPMSFL01                  SFL
+
+     A                                      SFLMSGRCD(24)
+
+     A            MSGKEY                    SFLMSGKEY
+
+     A            PGMQ                      SFLPGMQ(10)
+
+     A* Subfile Message Control Format
+
+     A          R PPMCTL01                  SFLCTL(PPMSFL01)
+
+     A                                      SFLDSP
+
+     A                                      SFLDSPCTL
+
+     A                                      SFLINZ
+
+     A                                      SFLSIZ(0002)
+
+     A                                      SFLPAG(0001)
+
+     A            PGMQ                      SFLPGMQ(10)    
+
+
+We will now see How to define the Prototypes for these APIs and how to call them to send the message and remove the message.
+
+QMHSNDPM (Send Program Message):
+
+QMHSNDPM API require 9 Mandatory parameters. see the Prototype declaration below.
+
+  Dcl-PR SendProgramMessage ExtPgm('QMHSNDPM') ;
+
+    MessageIdentifier Char(7) ; 
+
+    MessageFileName Char(20) ; 
+
+    MessageData Char(80) ;
+
+    LengthOfMessageData Packed(10 : 0) ;
+
+    MessageType Char(10) ;
+
+    CallStackEntry Char(10) ;
+
+    CallStackCounter Packed(10 : 0) ;
+
+    MessageKey Char(4) ;
+
+    ErrorData LikeDs(QUSEC) ;
+
+  END-PR;     
+
+
+Message Identifier - Predefined Message Identifier from Message File.
+
+Message FileName - Message File along with Library Name (*LIBL can be used). First 10 digits for Message file and next 10 digits are for Library Name.
+
+Message Data - If first two parameters are passed, This field would be used to pass the Data for the Variables used in the Message Identifier in Message File. If first two parameters are Blanks, Message passed in this parameter would be displayed. 
+
+Length Of Message Data - Length of Message Data passed in the previous parameter. 
+
+Message Type - Type of the message sent (*CMD - Command, *COMP - Completion, *DIAG - Diagnostic, *ESCAPE - Escape, *INFO - Informational, *NOTIFY - Notify, *RQS - Request and *STATUS - Status)
+
+Call Stack Entry - Used to Identify the Program Message Queue. '*' to be used to use the current Call stack entry.
+
+Call Stack Counter - Number to identify which Program Message Queue to send the message to. '0' indicates the last Program in the Call stack, '1' to indicate the previous program. Alternatively, any integer to identify the Program in the respective position. 
+
+Message Key - This is Output parameter. 
+
+Error Data - Error info. Error Data structure can be used from QUSEC in QSYSINC/QRPGLESRC. 
+
+            MessageIdentifier = 'MSG0001' ;
+
+            MessageFileName = 'PPTESTMSGF*LIBL     ' ;
+
+            MessageData = *Blanks ;
+
+            LengthOfMessageData = %Len(%Trim(MessageData)) ;
+
+            MessageType = '*INFO' ;
+
+            CallStackEntry = '*' ;
+
+            CallStackCounter = 0 ;
+
+            MessageKey = *Blanks ;
+
+
+
+            SendProgramMessage(MessageIdentifier
+
+                              :MessageFileName
+
+                              :MessageData
+
+                              :LengthOfMessageData
+
+                              :MessageType
+
+                              :CallStackEntry
+
+                              :CallStackCounter
+
+                              :MessageKey
+
+                              :ErrorData) ; 
+
+
+This can be called from RPG when ever there is an error and these messages would be displayed on EXFMT. Message Subfile control format to be written before EXFMT. 
+
+      Write PPMCTL01 ; // Message Subfile Control Format
+
+      Write PPFTR01 ; // Subfile Footer Record Format
+
+      Exfmt PPCTL01 ; // Subfile Control Format
+
+
+Messages need to be cleared whenever user does some action on the screen. So that these messages will not be shown again. 
+
+QMHRMVPM (Remove Program Message):
+
+QMHRMVPM requires 5 mandatory parameters. See the prototype declaration below. 
+
+  Dcl-PR RemoveMessage ExtPgm('QMHRMVPM') ;
+
+    CallStackEntry Char(10) ;
+
+    CallStackCounter Packed(10 : 0) ;
+
+    MesssgeKey Char(4) ;
+
+    MessagestoRemove Char(10) ;
+
+    ErrorData LikeDs(QUSEC) ;
+
+  End-PR;    
+
+
+Call Stack Entry - Used to Identify the Program Message Queue. '*' to be used to use the current Call stack entry.
+
+Call Stack Counter - Number to identify which Program Message Queue to send the message to. '0' indicates the last Program in the Call stack, '1' to indicate the previous program. Alternatively, any integer to identify the Program in the respective position. 
+
+Message Key - This is Output parameter. 
+
+Messages to Remove - Used to define a message or group of messages to be removed. *ALL - to remove all the messages
+
+Error Data - Error info. Error Data structure can be used from QUSEC in QSYSINC/QRPGLESRC. 
+
+      CallStackEntry = '*' ;
+
+      CallStackCounter = 0 ;
+
+      MessageKey = *Blanks ;
+
+      MessagestoRemove = '*ALL' ;
+
+
+
+      RemoveMessage(CallStackEntry
+
+                   :CallStackCounter
+
+                   :MessageKey
+
+                   :MessagestoRemove
+
+                   :ErrorData) ;
+
