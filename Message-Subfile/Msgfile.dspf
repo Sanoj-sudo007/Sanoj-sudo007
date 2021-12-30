@@ -1,0 +1,41 @@
+    A*%%TS  SD  20211229  075211  SANOJ       REL-V7R4M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      CA03(03)
+     A* Subfile Record format
+     A          R SFLRFMT                   SFL
+     A*%%TS  SD  20211229  075211  SANOJ       REL-V7R4M0  5770-WDS
+     A                                      SFLMSGRCD(24)
+     A            SFLKEY                    SFLMSGKEY
+     A            SFLPGMQ                   SFLPGMQ(10)
+      * Subfile control record format
+     A          R SFLCTLRFMT                SFLCTL(SFLRFMT)
+     A                                      SFLSIZ(4)
+     A                                      SFLPAG(1)
+     A                                      OVERLAY
+     A                                      SFLDSP
+     A                                      SFLDSPCTL
+     A                                      SFLINZ
+     A N03                                  SFLEND
+     A            SFLPGMQ                   SFLPGMQ
+     A* Header Record format on Display file
+     A          R HEADER
+     A*%%TS  SD  20211229  075211  SANOJ       REL-V7R4M0  5770-WDS
+     A                                      OVERLAY
+     A                                  5  2'Enter First Name.......:'
+     A                                      COLOR(WHT)
+     A                                  6  2'Enter Last Name........:'
+     A                                      COLOR(WHT)
+     A                                  7  2'Enter Address..........:'
+     A                                      COLOR(WHT)
+     A                                  1 20'Message Subfile Demo'
+     A                                      COLOR(BLU)
+     A            FIRSTNAME     10A  B  5 27COLOR(YLW)
+     A            LASTNAME      10A  B  6 27COLOR(YLW)
+     A            ADDRESS       20A  B  7 27COLOR(YLW)
+
+     A* FOOTER RECORD FORMAT
+     A          R FOOTER
+     A                                      OVERLAY
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
