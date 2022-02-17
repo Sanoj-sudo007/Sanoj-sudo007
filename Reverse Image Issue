@@ -1,0 +1,43 @@
+[5:29 PM] Ankit Sharma
+Pass = 0;
+Dow Pass = 0;
+EXSR CLRIND; //--- Clear all indicator list
+ExSr Sub_Rdchg; //--- For Any option is seleted
+If pass = 0;
+ExSr Sub_Dsply;
+EndIf;
+EndDo;
+
+[5:29 PM] Ankit Sharma
+BegSr Sub_Rdchg;
+Pass = 1;
+Readc EWMSFL;
+Dow Not %EOF();
+Select;
+When %trim(OPTD1) = ' ';
+When %trim(OPTD1) = '2';
+dsply '2';
+When %trim(OPTD1) = '4';
+DltFlg = 1;
+DLTCNT = DLTCNT+1;
+D_EWCOWH(DLTCNT) = EWCOWHD1;
+D_EWCOM#(DLTCNT) = EWCOM#D1;
+When %trim(OPTD1) = '5';
+Exsr DspCust;
+Other;
+Pass = 0;
+OPT_rv = *on;
+ErrMsg = *on;
+SFLNXTCHG = *on;
+Update EWMSFL;
+Leavesr;
+Endsl;
+Readc EWMSFL;
+EndDo;
+// If the Flag is 1 it means '4' option is choosen
+If DLTFLG = 1;
+OPTD1 = ' ';
+Exsr DltCust;
+EndIf;
+EndSr;
+
