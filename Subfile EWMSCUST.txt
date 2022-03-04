@@ -1,0 +1,25 @@
+     A          R REWMSCUST                                                       
+     A            EWCOWH         3A         COLHDG('WAREHOUSE')                   
+     A                                      TEXT('WAREHOUSE FOR COMPANY')         
+     A            EWCOM#        15A         COLHDG('COMPANY')                     
+     A                                      TEXT('COMPANY NAME')                  
+     A            EWTPNM        35A         COLHDG('TRADING PARTNER')             
+     A                                      TEXT('TRADING PARTNER NAME')          
+     A            EW940          1A         COLHDG('TRADE 940')                   
+     A                                      TEXT('FLAG INDICATES THAT THE 940'+   
+     A                                      ' IS EXCHANGED WITH THIS TRADING '+   
+     A                                      'PARTNER')                            
+     A            EW943          1A         COLHDG('TRADE 943')                   
+     A                                      TEXT('FLAG INDICATES THAT THE 943'+   
+     A                                      ' IS EXCHANGED WITH THIS TRADING '+   
+     A                                      'PARTNER')                            
+     A            EW944          1A         COLHDG('TRADE 944')                   
+     A                                      TEXT('FLAG INDICATES THAT THE 944'+   
+     A                                      ' IS EXCHANGED WITH THIS TRADING '+   
+     A                                      'PARTNER')                             
+     A            EW945          1A         COLHDG('TRADE 945')                    
+     A                                      TEXT('FLAG INDICATES THAT THE 945'+    
+     A                                      ' IS EXCHANGED WITH THIS TRADING '+    
+     A                                      'PARTNER')                             
+     A          K EWCOWH                                                           
+     A          K EWCOM#                                                           

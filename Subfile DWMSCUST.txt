@@ -1,0 +1,268 @@
+     A*%%TS  SD  20220221  053815  MISPGMR     REL-V7R1M0  5770-WDS          
+     A*%%EC                                                                  
+     A                                      DSPSIZ(24 80 *DS3)               
+     A                                      INDARA                           
+     A          R EWMSFL                    SFL                              
+     A*%%TS  SD  20220221  024123  MISPGMR     REL-V7R1M0  5770-WDS          
+     A  66                                  SFLNXTCHG                        
+     A            EWTPNMD1      27A  O 12 32                                 
+     A            EWCOWHD1       3A  O 12  7                                 
+     A            EWCOM#D1      15A  O 12 14                                 
+     A            EW940D1        1A  O 12 62                                 
+     A            EW943D1        1A  O 12 67                                 
+     A            EW944D1        1A  O 12 72                                 
+     A            EW945D1        1A  O 12 77                                 
+     A            OPTD1          2A  B 12  2                                 
+     A  81                                  DSPATR(RI)                       
+     A  82                                  DSPATR(PC)                       
+     A          R EWMSFLCTL                 SFLCTL(EWMSFL)                   
+     A*%%TS  SD  20220217  054512  MISPGMR     REL-V7R1M0  5770-WDS          
+     A                                      SFLSIZ(0100)                           
+     A                                      SFLPAG(0005)                           
+     A                                      CF03(03 'EXIT')                        
+     A                                      CF12(12 'CANCEL')                      
+     A                                      CF05(05 'REFRESH')                     
+     A                                      CF06(06 'ADD')                         
+     A                                      OVERLAY                                
+     A  50                                  SFLDSP                                 
+     A  51                                  SFLDSPCTL                              
+     A  52                                  SFLCLR                                 
+     A  53                                  SFLEND(*MORE)                          
+     A  71                                  SFLMSG('INVALID OPTION: CHOOSE OPTI-   
+     A                                      ON 2,4 AND 5 ONLY')                    
+     A  72                                  SFLMSG('INVALID OPTION: ONLY SAME O-   
+     A                                      PTIONS ARE ALLOWED')                   
+     A  73                                  SFLMSG('RECORDS DELETED SUCCESSFULL-   
+     A                                      Y')                                    
+     A            RCDNBR         4S 0H      SFLRCDNBR(*TOP CURSOR)                 
+     A                                  4 33'Position to . . .'                    
+
+     A                                      COLOR(TRQ)                          
+     A                                 10  2'Opt'                               
+     A                                      COLOR(WHT)                          
+     A                                 10 14'Company Name'                      
+     A                                      COLOR(WHT)                          
+     A                                 10 32'Tranding Partner'                  
+     A                                      COLOR(WHT)                          
+     A                                  6  2'Type options, press Enter.'        
+     A                                      COLOR(BLU)                          
+     A                                 10  7'Ware-'                             
+     A                                      COLOR(WHT)                          
+     A                                 11  7'House'                             
+     A                                      COLOR(WHT)                          
+     A                                 10 61'940'                               
+     A                                      COLOR(WHT)                          
+     A                                 10 66'943'                               
+     A                                      COLOR(WHT)                          
+     A                                 10 71'944'                               
+     A                                      COLOR(WHT)                          
+
+     A                                 10 76'945'                                  
+     A                                      COLOR(WHT)                             
+     A                                  1 21'EDI Warehouse-Customer Management -   
+     A                                      System'                                
+     A                                      COLOR(WHT)                             
+     A                                  7  2'2=Update  4=Delete  5=Display'        
+     A                                      COLOR(BLU)                             
+     A            POSD1         15A  I  4 51                                       
+     A                                  4 67'Company Name'                         
+     A                                      COLOR(TRQ)                             
+     A                                  2 71TIME                                   
+     A                                      COLOR(YLW)                             
+     A                                  2  2DATE                                   
+     A                                      EDTCDE(Y)                              
+     A                                      COLOR(YLW)                             
+     A          R EMSFOOTER                                                        
+     A*%%TS  SD  20220215  010806  MISPGMR     REL-V7R1M0  5770-WDS                
+     A                                 23  3'F3=Exit     F5=Refresh     F6=Add -   
+     A                                          F12=Cancel'                        
+
+     A                                      COLOR(BLU)                         
+     A          R DLTSFL                    SFL                                
+     A*%%TS  SD  20220217  084618  MISPGMR     REL-V7R1M0  5770-WDS            
+     A            EWTPNMD2      27A  O 11 32                                   
+     A            EWCOWHD2       3A  O 11  3                                   
+     A            EWCOM#D2      15A  O 11 14                                   
+     A            EW940D2        1A  O 11 62                                   
+     A            EW944D2        1A  O 11 67                                   
+     A            EW943D2        1A  O 11 72                                   
+     A            EW945D2        1A  O 11 77                                   
+     A          R DLTSFLCTL                 SFLCTL(DLTSFL)                     
+     A*%%TS  SD  20220217  084618  MISPGMR     REL-V7R1M0  5770-WDS            
+     A                                      SFLSIZ(0100)                       
+     A                                      SFLPAG(0005)                       
+     A                                      CF12(12 'CANCEL')                  
+     A                                      OVERLAY                            
+     A  54                                  SFLDSP                             
+     A  55                                  SFLDSPCTL                          
+     A  56                                  SFLCLR                             
+     A  57                                  SFLEND(*MORE)                           
+     A                                 10 14'Company'                               
+     A                                      COLOR(WHT)                              
+     A                                 10 32'Tranding Partner'                      
+     A                                      COLOR(WHT)                              
+     A                                  6  2'Press Enter to confirm your choice-    
+     A                                      s for Delete.'                          
+     A                                      COLOR(BLU)                              
+     A                                 10  2'WareHouse'                             
+     A                                      COLOR(WHT)                              
+     A                                 10 61'940'                                   
+     A                                      COLOR(WHT)                              
+     A                                 10 66'944'                                   
+     A                                      COLOR(WHT)                              
+     A                                 10 71'943'                                   
+     A                                      COLOR(WHT)                              
+     A                                 10 76'945'                                   
+     A                                      COLOR(WHT)                              
+     A                                  1 21'EDI Warehouse-Customer Management -    
+
+     A                                      System'                             
+     A                                      COLOR(WHT)                          
+     A                                  7  2'Press F12=Cancel to return to chan-
+     A                                      ge your choices.'                   
+     A                                      COLOR(BLU)                          
+     A                                  2  2DATE                                
+     A                                      EDTCDE(Y)                           
+     A                                      COLOR(YLW)                          
+     A                                  2 71TIME                                
+     A                                      COLOR(YLW)                          
+     A          R DLTFOOTER                                                     
+     A*%%TS  SD  20220216  014741  MISPGMR     REL-V7R1M0  5770-WDS             
+     A                                 23  3'F12=Cancel'                        
+     A                                      COLOR(BLU)                          
+     A          R EWMADD                                                        
+     A*%%TS  SD  20220221  053815  MISPGMR     REL-V7R1M0  5770-WDS             
+     A                                      WINDOW(4 10 17 58)                  
+     A                                      CF12(12 'CANCEL')                   
+     A                                      CF04(04 'ADD')                      
+     A                                      CF05(05 'refresh')              
+     A                                  6  2'Tranding Partner...:'          
+     A                                  5  2'Company............:'          
+     A                                  4  2'Warehouse..........:'          
+     A                                  9  2'940 Document.......:'          
+     A                                 10  2'944 Document.......:'          
+     A                                 11  2'943 Document.......:'          
+     A                                 12  2'945 Document.......:'          
+     A                                 15 26'F12=Cancel'                    
+     A                                      COLOR(BLU)                      
+     A            EWCOWHW1       3A  B  4 24                                
+     A  91                                  DSPATR(RI)                      
+     A  91                                  DSPATR(PC)                      
+     A            EWCOM#W1      15A  B  5 24                                
+     A  92                                  DSPATR(RI)                      
+     A  92                                  DSPATR(PC)                      
+     A            EWTPNMW1      35A  B  6 24                                
+     A  93                                  DSPATR(RI)                      
+     A  93                                  DSPATR(PC)                      
+     A                                      CHECK(LC)                           
+     A            EW940W1        1A  B  9 24                                    
+     A  94                                  DSPATR(RI)                          
+     A  94                                  DSPATR(PC)                          
+     A            EW944W1        1A  B 10 24                                    
+     A  95                                  DSPATR(RI)                          
+     A  95                                  DSPATR(PC)                          
+     A            EW943W1        1A  B 11 24                                    
+     A  96                                  DSPATR(RI)                          
+     A  96                                  DSPATR(PC)                          
+     A            EW945W1        1A  B 12 24                                    
+     A  97                                  DSPATR(RI)                          
+     A  97                                  DSPATR(PC)                          
+     A                                  1 22'Add New Customer'                  
+     A                                      COLOR(WHT)                          
+     A                                 15  2'F4=Add'                            
+     A                                      COLOR(BLU)                          
+     A                                  8  2'Y=Processing on Document / N=Not P-
+     A                                      rocessing:'                         
+     A                                      COLOR(BLU)                          
+     A                                  3  2'Customer Details:'                 
+     A                                      COLOR(BLU)                          
+     A            ERRMSGW1      40A  O 16  2COLOR(RED)                          
+     A                                 15 12'F5=Refresh'                        
+     A                                      COLOR(BLU)                          
+     A                                 13  2'Press enter... To check validation-
+     A                                       of Field Entries'                  
+     A                                      COLOR(WHT)                          
+     A          R EWMUPDDTA                                                     
+     A*%%TS  SD  20220218  035233  MISPGMR     REL-V7R1M0  5770-WDS             
+     A                                      WINDOW(4 10 17 58)                  
+     A                                      CF12(12 'cancel')                   
+     A                                      CF04(04 'update')                   
+     A                                      CF05(05 'refresh')                  
+     A                                  6  2'Tranding Partner...:'              
+     A                                  5  2'Company............:'              
+     A                                  4  2'Warehouse..........:'              
+     A                                  9  2'940 Document.......:'              
+     A                                 10  2'944 Document.......:'            
+     A                                 11  2'943 Document.......:'            
+     A                                 12  2'945 Document.......:'            
+     A                                 15 29'F12=Cancel'                      
+     A                                      COLOR(BLU)                        
+     A            EWCOWHW2       3A  O  4 24                                  
+     A            EWCOM#W2      15A  O  5 24                                  
+     A            EWTPNMW2      35A  B  6 24                                  
+     A  31                                  DSPATR(RI)                        
+     A  31                                  DSPATR(PC)                        
+     A                                      CHECK(LC)                         
+     A            EW940W2        1A  B  9 24                                  
+     A  32                                  DSPATR(RI)                        
+     A  32                                  DSPATR(PC)                        
+     A            EW944W2        1A  B 10 24                                  
+     A  33                                  DSPATR(RI)                        
+     A  33                                  DSPATR(PC)                        
+     A            EW943W2        1A  B 11 24                                  
+     A  34                                  DSPATR(RI)                        
+     A  34                                  DSPATR(PC)                              
+     A            EW945W2        1A  B 12 24                                        
+     A  35                                  DSPATR(RI)                              
+     A  35                                  DSPATR(PC)                              
+     A                                  1 23'Update Customer'                       
+     A                                      COLOR(WHT)                              
+     A                                 15  2'F4=Update'                             
+     A                                      COLOR(BLU)                              
+     A                                  8  2'Y=Processing on Document / N=Not P-    
+     A                                      rocessing:'                             
+     A                                      COLOR(BLU)                              
+     A                                  3  2'Customer Details:'                     
+     A                                      COLOR(BLU)                              
+     A            ERRMSGW2      40A  O 16  2COLOR(RED)                              
+     A                                 15 15'F5=Refresh'                            
+     A                                      COLOR(BLU)                              
+     A                                 13  2'Enter to check Validation of field-    
+     A                                      s'                                      
+     A                                      COLOR(WHT)                              
+     A          R EWMDSP                                                       
+     A*%%TS  SD  20220218  035034  MISPGMR     REL-V7R1M0  5770-WDS            
+     A                                      WINDOW(4 10 17 58)                 
+     A                                      CF12(12 'Back')                    
+     A                                  6  2'Tranding Partner...:'             
+     A                                  5  2'Company............:'             
+     A                                  4  2'Warehouse..........:'             
+     A                                  9  2'940 Document.......:'             
+     A                                 10  2'943 Document.......:'             
+     A                                 11  2'944 Document.......:'             
+     A                                 12  2'945 Document.......:'             
+     A                                 15  2'F12=Cancel'                       
+     A                                      COLOR(BLU)                         
+     A            EWCOWHW3       3A  O  4 24                                   
+     A            EWCOM#W3      15A  O  5 24                                   
+     A            EWTPNMW3      35A  O  6 24                                   
+     A            EW940W3        1A  O  9 24                                   
+     A            EW944W3        1A  O 11 24                                   
+     A            EW943W3        1A  O 10 24                                   
+     A            EW945W3        1A  O 12 24                                    
+     A                                  1 18'Display Customer Details'          
+     A                                      COLOR(WHT)                          
+     A                                  8  2'Y=Processing on Document / N=Not P-
+     A                                      rocessing:'                         
+     A                                      COLOR(BLU)                          
+     A                                  3  2'Customer Details:'                 
+     A                                      COLOR(BLU)                          
+     A          R DLTCNF                                                        
+     A*%%TS  SD  20220217  044751  MISPGMR     REL-V7R1M0  5770-WDS             
+     A                                      WINDOW(9 17 5 40)                   
+     A                                  2  5'Do You Really Want To Delete !!!'  
+     A                                  4  7'Type (Y/N)'                        
+     A                                      COLOR(BLU)                          
+     A            CONFIRM        1A  B  4 19                                    
+     A                                  4 21'(Y=Yes / N=No)'                    
+     A                                      COLOR(BLU)                          

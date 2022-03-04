@@ -1,0 +1,729 @@
+H DFTACTGRP(*NO) ACTGRP(*NEW) OPTION(*SRCSTMT:*NODEBUGIO)                
+                                                                         
+  //---------------------------------------------------------------      
+  // PROGRAM...... PWMSCUST                                              
+  // DATE......... 02/15/2022                                            
+  // PROGRAMER.... PROGRAMMERS.IO                                        
+  // FUNCTION..... EDI Warehouse - Customer Management System            
+  // --------------------------------------------------------------      
+  // Chg Date     Inits  Description                                     
+  // ----------   -----  ------------------------------------------      
+  //                                                                     
+  // --------------------------------------------------------------      
+                                                                         
+  //  Files  ------------------------------------------------------      
+FEWMSCUST  UF A E           K Disk                                       
+FEWMSCUSTL UF A E           K Disk    Rename(REWMSCUST:REWMSCUSTL)       
+FDWMSCUST  CF   E             WORKSTN                                    
+F                                     SFILE(DLTSFL:RRN#)                 
+F                                     SFILE(EWMSFL:RRN@)                 
+F                                     INFDS(infds)                   
+F                                     INDDS(INDDS@)                  
+                                                                     
+  //  Variables ---------------------------------------------------  
+DRRN@             S              4S 0 INZ(0)                         
+DRRN#             S              4S 0 INZ(0)                         
+DD_EWCOWH         S              3A   Dim(9999)                      
+DD_EWCOM#         S             15A   Dim(9999)                      
+DW_EWCOM#         S             15A                                  
+DP_EWCOM#         S             15A                                  
+DL_opt            S              2A                                  
+DDLTCNT           s              4S 0 INZ(0)                         
+DRRNCNT           s              4S 0 INZ(0)                         
+DDLTFLG           s              1S 0 INZ(0)                         
+DDLTFLG2          s              1S 0 INZ(0)                         
+Di                s              4S 0 INZ(0)                         
+Dj                s              4S 0 INZ(0)                         
+DPass             s              1S 0 INZ(0)                         
+DPosFlag          s              1S 0 INZ(0)                         
+DPOSFLG           s              1S 0 INZ(0)                 
+D INDDS@          ds                                         
+D  ExitF3                        1N   overlay(INDDS@:03)     
+D  AddF4                         1N   overlay(INDDS@:04)     
+D  RefreshF5                     1N   overlay(INDDS@:05)     
+D  AddF6                         1N   overlay(INDDS@:06)     
+D  BackF12                       1N   overlay(INDDS@:12)     
+D  SFL_DSP                       1N   overlay(INDDS@:50)     
+D  SFL_CTL                       1N   overlay(INDDS@:51)     
+D  SFL_CLR                       1N   overlay(INDDS@:52)     
+D  SFL_END                       1N   overlay(INDDS@:53)     
+D  DLT_DSP                       1N   overlay(INDDS@:54)     
+D  DLT_CTL                       1N   overlay(INDDS@:55)     
+D  DLT_CLR                       1N   overlay(INDDS@:56)     
+D  DLT_END                       1N   overlay(INDDS@:57)     
+D  OPT_rv                        1N   overlay(INDDS@:81)     
+D  OPT_pc                        1N   overlay(INDDS@:82)     
+D  ErrMsg                        1N   overlay(INDDS@:71)     
+D  ErrMsg2                       1N   overlay(INDDS@:72)     
+D  Errdltmsg                     1N   overlay(INDDS@:73)                  
+D  SFLNXTCHG                     1N   overlay(INDDS@:66)                  
+D  RI91                          1N   overlay(INDDS@:91)                  
+D  RI92                          1N   overlay(INDDS@:92)                  
+D  RI93                          1N   overlay(INDDS@:93)                  
+D  RI94                          1N   overlay(INDDS@:94)                  
+D  RI95                          1N   overlay(INDDS@:95)                  
+D  RI96                          1N   overlay(INDDS@:96)                  
+D  RI97                          1N   overlay(INDDS@:97)                  
+D  RI31                          1N   overlay(INDDS@:31)                  
+D  RI32                          1N   overlay(INDDS@:32)                  
+D  RI33                          1N   overlay(INDDS@:33)                  
+D  RI34                          1N   overlay(INDDS@:34)                  
+D  RI35                          1N   overlay(INDDS@:35)                  
+                                                                          
+Dinfds            DS                                                      
+D MIN_RRN               378    379I 0                                     
+                                                                          
+  //--------------------------------------------------------------------- 
+  // Main Process                                                          
+  //---------------------------------------------------------------------  
+     ExSr Sub_Main ;                                                       
+     Exsr End;                                                             
+                                                                           
+  //---------------------------------------------------------------------  
+  // Sub_Main - Main Processing Routine                                    
+  //---------------------------------------------------------------------  
+     BegSr Sub_Main ;                                                      
+                                                                           
+     EXEC SQL                                                              
+       Set Option Commit = *None;                                          
+                                                                           
+                                                                           
+       EXSR CLRIND;               //--- Clear all indicator list           
+       EXSR CLRFLD;               //--- Clear all Fields and Work Variables
+       Dow ExitF3 = *off or BackF12 = *off;                                
+         ExSr Sub_Clear;          //--- Clear Main Subfile                 
+         ExSr Sub_Load ;          //--- Loading process of Main Subfile    
+         If DLTFLG2 = 1;                                               
+           DLTFLG2 = 0;                                                
+           ErrDLTMSG = *on;                                            
+         EndIf;                                                        
+         ExSr Sub_Dsply;          //--- Display Main Subfile           
+                                                                       
+         Pass = 0;                                                     
+         If RRN@ <> 0;                                                 
+           RCDNBR = MIN_RRN;                                           
+           Dow Pass = 0;                                               
+             EXSR CLRIND;             //--- Clear all indicator list   
+             ExSr Sub_Rdchg;          //--- For Any option is seleted  
+             If pass = 0;                                              
+               ExSr Sub_Dsply;      //--- Display Main Subfile         
+             EndIf;                                                    
+           EndDo;                                                      
+         Else;                                                         
+           RCDNBR = 1;                                                 
+         Endif;                                                        
+       EndDo;                                                                   
+       BackF12 = *off;                                                          
+     EndSr;                                                                     
+                                                                                
+  //---------------------------------------------------------------------       
+  // Sub_Clear- Subfile clear subroutine                                        
+  //---------------------------------------------------------------------       
+     BegSr Sub_Clear;                                                           
+       SFL_DSP = *Off;                                                          
+       SFL_CTL = *Off;                                                          
+       SFL_CLR = *ON ;                                                          
+       SFL_END = *Off;                                                          
+       RRN@ = 0;                                                                
+       DLTCNT = 0;                                                              
+       DLTFLG = 0;                                                              
+       Write EWMSFLCTL;                                                         
+       SFL_CTL = *ON ;                                                          
+       SFL_CLR = *Off;                                                          
+       SFL_END = *ON ;                                                          
+     EndSr ;                                                                               
+                                                                                           
+  //---------------------------------------------------------------------                  
+  // Sub_Load - Subfile Load subroutine                                                    
+  //---------------------------------------------------------------------                  
+     BegSr Sub_Load ;    //--- Loading of subfile from EWMSCUST file in ascending order    
+                                                                                           
+       SFL_DSP = *On;                                                                      
+                                                                                           
+       //--- Use the below cursor to read and write data into subfile                      
+       Exec sql DECLARE RDEWMS CURSOR FOR                                                  
+                     SELECT * FROM EWMSCUST ORDER BY EWCOM#;                               
+                                                                                           
+       //--- Opening cursor to fetch the records                                           
+       Exec sql OPEN RDEWMS;                                                               
+                                                                                           
+       Exec sql FETCH Next FROM RDEWMS INTO :EWCOWHD1, :EWCOM#D1,                          
+          :EWTPNMD1, :EW940D1, :EW943D1, :EW944D1, :EW945D1;                               
+                                                                                           
+                                                                                
+      //--- If SQLCODE is Not 0 it means the file reach to end record           
+      Dow SQLCode = 0;                                                          
+                                                                                
+        RRN@ = RRN@ + 1;                                                        
+        If RRN@ > 9999;                                                         
+          Leave;                                                                
+        EndIf;                                                                  
+                                                                                
+        Write EWMSFL;                                                           
+                                                                                
+        Exec sql FETCH NEXT FROM RDEWMS INTO :EWCOWHD1, :EWCOM#D1,              
+           :EWTPNMD1, :EW940D1, :EW943D1, :EW944D1, :EW945D1;                   
+                                                                                
+      EndDO;                                                                    
+                                                                                
+      Exec sql Close RDEWMS;                                                    
+                                                                                
+      RCDNBR = 1;                                                               
+                                                                                       IF POSD1 <> *blank;                                                              
+         Exsr Possr;                        //--- (Position to) cursor set subroutine   
+       EndIf;                                                                           
+                                                                                        
+     EndSr ;                                                                            
+                                                                                        
+  //---------------------------------------------------------------------               
+  // Sub_Possr- Position to feature of Subfile display subroutine                       
+  //---------------------------------------------------------------------               
+     BegSr Possr;                                                                       
+                                                                                        
+       //--- If the searching value is similar to data of Customer table                
+       //--- then cursor will locate to last similar data found                         
+                                                                                        
+       Clear P_EWCOM#;                                                                  
+       POSFLG = 0;                                                                      
+                                                                                        
+           Exec sql DECLARE PTSRCH SCROLL CURSOR FOR                                    
+             SELECT EWCOM# FROM PIOLIB/EWMSCUST where EWCOM# <= :POSD1                  
+
+             Order By EWCOM#;                                                             
+                                                                                          
+             Exec sql OPEN PTSRCH;                                                        
+             //--- Fatch the similar record and store the company into work variable      
+             Exec sql FETCH LAST FROM PTSRCH INTO :P_EWCOM#;                              
+                                                                                          
+             If SQLCODE = 100;           //--- data not found                             
+               RCDNBR = 1;                                                                
+               POSFLG  = 1;                                                               
+             EndIf;                                                                       
+                                                                                          
+         Exec sql Close PTSRCH;                                                           
+                                                                                          
+       //--- If no data found then no need to search the for searching value              
+       If POSFLG = 0;                                                                     
+                                                                                          
+         RRNCNT = 0;                                                                      
+         Clear W_EWCOM#;                                                                  
+         Exec sql DECLARE PTEWMS CURSOR FOR                                               
+
+                       SELECT EWCOM# FROM EWMSCUST ORDER BY EWCOM#;                 
+                                                                                    
+         Exec sql OPEN PTEWMS;                                                      
+         Exec sql FETCH NEXT FROM PTEWMS INTO :W_EWCOM#;                            
+                                                                                    
+         Dow SQLCode = 0;                                                           
+                                                                                    
+           RRNCNT = RRNCNT+1;                                                       
+                                                                                    
+           //--- If the Searching value is equal to Data in Customer table          
+           //--- then set the Cursor at specific record                             
+           If W_EWCOM# = P_EWCOM#;                                                  
+             RCDNBR = RRNCNT;                                                       
+             OPT_PC = *on;                                                          
+           EndIf;                                                                   
+                                                                                    
+           Exec sql FETCH NEXT FROM PTEWMS INTO :W_EWCOM#;                          
+                                                                                    
+         EndDO;                                                                     
+
+                                                                                            
+         Exec sql Close PTEWMS;                                                             
+       EndIf;                                                                               
+                                                                                            
+     Endsr;                                                                                 
+                                                                                            
+  //---------------------------------------------------------------------                   
+  // Sub_Dsply- Subfile display subroutine                                                  
+  //---------------------------------------------------------------------                   
+     BegSr Sub_Dsply;                                                                       
+                                                                                            
+       If RRN@ = 0;               //--- If RRN value is 0 Then, SFLDSP indicator is off     
+         SFL_DSP = *Off;          //--- to prevent subfile exception                        
+       EndIf;                                                                               
+                                                                                            
+       OPT_PC = *on;                                                                        
+       write EMSFOOTER;           //--- Writing footer                                      
+       Exfmt EWMSFLCTL;                                                                     
+                                                                                            
+
+       If ExitF3 = *on or BackF12 = *on;  //- When the F3 or F12 is press then end the program
+         EXSR End;                                                                            
+       endif;                                                                                 
+                                                                                              
+       If RefreshF5 = *On;      //--- When the F5 key press Indicator will be On              
+         RefreshF5 = *Off;                                                                    
+         EXSR Sub_Main;                                                                       
+       EndIf;                                                                                 
+                                                                                              
+       If AddF6 = *On;            //--- If F6 key is pressed then Open the Add window         
+         Dow BackF12 = *Off;                                                                  
+                                                                                              
+           Exfmt EWMADD;                                                                      
+                                                                                              
+           Exsr $Add;         //--- Add Customer Validation                                   
+                                                                                              
+           If RefreshF5 = *on;   //--- When the F5 key press Indicator will be On             
+              Exsr CLR_RI;                                                                    
+
+              Exsr CLR_FLD;                                                                    
+           Endif;                                                                              
+           RefreshF5 = *Off;                                                                   
+         EndDo;                                                                                
+                                                                                               
+         BackF12 = *off;                                                                       
+         Exsr CLR_RI;                                                                          
+         Exsr CLR_FLD;                                                                         
+       EndIf;                                                                                  
+                                                                                               
+       AddF6 = *off;                                                                           
+     EndSr ;                                                                                   
+                                                                                               
+  //---------------------------------------------------------------------                      
+  // Sub_Rdchg- Read the changed option in Display custumers subroutine                        
+  //---------------------------------------------------------------------                      
+     BegSr Sub_Rdchg;                                                                          
+       //--- Checking the Options are same or not                                              
+       //--- If the Option is not same as the last option it will generate error               
+
+       Readc EWMSFL;                                                                          
+       L_opt = OPTD1;                                                                         
+       Dow Not %EOF();                                                                        
+         If (%trim(OPTD1) <> %trim(L_opt) and OPTD1<> *blank                                  
+             and L_opt <> *blank);                                                            
+           RCDNBR = RRN@;                                                                     
+                                                                                              
+           If (%trim(OPTD1) = '2' Or  %trim(OPTD1) = '4' Or                                   
+              %trim(OPTD1) = '5');                                                            
+             Errmsg2 = *ON;         //--- Error pop up for Dissimilar option                  
+           Else;                                                                              
+             Errmsg = *ON;          //--- Error pop up for invalid option                     
+           EndIf;                                                                             
+                                                                                              
+           OPT_rv = *on;                                                                      
+           Pass = 0;                                                                          
+           SFLNXTCHG = *on;                                                                   
+           Update EWMSFL;                                                                     
+           Leavesr;                 //--- If the error occours then program will display error
+
+         EndIf;                                                                               
+         L_opt = OPTD1;                                                                       
+         SFLNXTCHG = *on;                                                                     
+         Update EWMSFL;                                                                       
+         Readc EWMSFL;                                                                        
+       EndDo;                                                                                 
+                                                                                              
+                                                                                              
+       Pass = 1;                                                                              
+       Readc EWMSFL;                                                                          
+       Dow Not %EOF();                                                                        
+         Select;                                                                              
+           When %trim(OPTD1) = ' ';                                                           
+             OPT_RV = *off;                                                                   
+             SFLNXTCHG = *on;                                                                 
+             Update EWMSFL;                                                                   
+                                                                                              
+           When %trim(OPTD1) = '2';                                                           
+             clear OPTD1;                                                                     
+
+             Exsr UpdCust;                                                                   
+             OPT_RV = *off;                                                                  
+             SFLNXTCHG = *on;                                                                
+             Update EWMSFL;                                                                  
+                                                                                             
+           When %trim(OPTD1) = '4';                                                          
+             OPT_RV = *off;                                                                  
+             DltFlg = 1;                                                                     
+             DLTCNT = DLTCNT+1;                                                              
+             D_EWCOWH(DLTCNT) = EWCOWHD1;                                                    
+             D_EWCOM#(DLTCNT) = EWCOM#D1;                                                    
+             clear OPTD1;                                                                    
+             SFLNXTCHG = *on;                                                                
+             Update EWMSFL;                                                                  
+                                                                                             
+           When %trim(OPTD1) = '5';                                                          
+             clear OPTD1;                                                                    
+             OPT_RV = *off;                                                                  
+             Exsr DspCust;                                                                   
+
+             SFLNXTCHG = *on;                                                                
+             Update EWMSFL;                                                                  
+                                                                                             
+           Other;                                                                            
+             RCDNBR = RRN@;                                                                  
+             Pass = 0;                                                                       
+             OPT_rv = *on;                                                                   
+             ErrMsg = *on;                                                                   
+             SFLNXTCHG = *on;                                                                
+             Update EWMSFL;                                                                  
+             Leavesr;                                                                        
+         Endsl;                                                                              
+         Readc EWMSFL;                                                                       
+       EndDo;                                                                                
+                                                                                             
+      //--- If the Flag is 1 it means '4' option is choosen                                  
+         If DLTFLG = 1;                                                                      
+           Exsr DltCust;                                                                     
+           OPTD1 = ' ';                                                                      
+
+        EndIf;                                                                        
+                                                                                      
+      Clear OPTD1;                                                                    
+    EndSr;                                                                            
+                                                                                      
+ //---------------------------------------------------------------------              
+ // UpdCust - Update custumers subroutine                                             
+ //---------------------------------------------------------------------              
+    BegSr UpdCust;                                                                    
+              Exsr CLR_RI1;                                                           
+              Dow BackF12 = *off;                                                     
+                  CHAIN (EWCOWHD1:EWCOM#D1) EWMSCUST;                                 
+                  EWCOWHW2 =  EWCOWH  ;                                               
+                  EWCOM#W2 =  EWCOM#  ;                                               
+                  EWTPNMW2 =  EWTPNM  ;                                               
+                  EW940W2  =  EW940  ;                                                
+                  EW943W2  =  EW943  ;                                                
+                  EW944W2  =  EW944  ;                                                
+                  EW945W2  =  EW945  ;                                                
+
+                   Exfmt EWMUPDDTA;                                                     
+                      Exsr $Update;                                                     
+                   If RefreshF5 = *On;                                                  
+                    Exsr CLR_RI1;                                                       
+                    Iter;                                                               
+                   Endif;                                                               
+                   RefreshF5 = *off;                                                    
+               EndDo;                                                                   
+               BackF12 = *Off;                                                          
+     EndSr;                                                                             
+                                                                                        
+ //-------------------------------------------------------------------                  
+ // Update Customer information(Validation)                                             
+ //-------------------------------------------------------------------                  
+  Begsr $Update;                                                                        
+       If EWTPNMW2 = *blank;                                                            
+           Exsr CLR_RI1;                                                                
+           RI31 = *on ;                                                                 
+           ERRMSGW2 = 'Field cannot be blank';                                          
+
+       Elseif EW940W2  = *blank;                                                             
+           Exsr CLR_RI1;                                                                     
+           RI32 = *On;                                                                       
+           ERRMSGW2 = 'Field cannot be blank';                                               
+       Elseif EW944W2  = *blank;                                                             
+           Exsr CLR_RI1;                                                                     
+           RI33 = *On;                                                                       
+           ERRMSGW2 = 'Field cannot be blank';                                               
+       Elseif EW943W2  = *blank;                                                             
+           Exsr CLR_RI1;                                                                     
+           RI34 = *on ;                                                                      
+           ERRMSGW2 = 'Field cannot be blank';                                               
+       Elseif EW945W2  = *blank;                                                             
+           Exsr CLR_RI1;                                                                     
+           RI35 = *on ;                                                                      
+           ERRMSGW2 = 'Field cannot be blank';                                               
+       Else;                                                                                 
+           If EW940W2 <> 'Y' and EW940W2 <> 'N';                                             
+              Exsr CLR_RI1;                                                                  
+
+              RI32 = *on ;                                                                   
+              ERRMSGW2 = 'Either Y or N is allowed';                                         
+           ElseIf EW944W2 <> 'Y' and EW944W2 <> 'N';                                         
+              Exsr CLR_RI1;                                                                  
+              RI32 = *on ;                                                                   
+              ERRMSGW2 = 'Either Y or N is allowed';                                         
+           ElseIf EW943W2 <> 'Y' and EW943W2 <> 'N';                                         
+              Exsr CLR_RI1;                                                                  
+              RI34 = *on ;                                                                   
+              ERRMSGW2 = 'Either Y or N is allowed';                                         
+           ElseIf EW945W2 <> 'Y' and EW945W2 <> 'N';                                         
+              Exsr CLR_RI1;                                                                  
+              RI35 = *on ;                                                                   
+              ERRMSGW2 = 'Either Y and N is allowed';                                        
+           Else;                                                                             
+              Exsr CLR_RI1;                                                                  
+              Chain (EWCOWHD1:EWCOM#D1) EWMSCUST;                                            
+              If %Found();                                                                   
+                EWTPNM =  %trim(EWTPNMW2);                                                   
+
+                EW940  =  %trim(EW940W2);                                                
+                EW943  =  %trim(EW943W2);                                                
+                EW944  =  %trim(EW944W2);                                                
+                EW945  =  %trim(EW945W2);                                                
+                If AddF4 = *on;                                                          
+                  Update REWMSCUST;                                                      
+                  ERRMSGW2 = 'Customer updated';                                         
+                EndIf;                                                                   
+                AddF4 = *off;                                                            
+              Endif;                                                                     
+           Endif;                                                                        
+     Endif;                                                                              
+  EndSr;                                                                                 
+                                                                                         
+  //---------------------------------------------------------------------                
+  // CLR_RI1 Clear reverse image                                                         
+  //---------------------------------------------------------------------                
+  Begsr CLR_RI1;                                                                         
+      RI31 = *Off;                                                                       
+
+      RI32 = *Off;                                                                   
+      RI33 = *Off;                                                                   
+      RI34 = *Off;                                                                   
+      RI35 = *Off;                                                                   
+      ERRMSGW2 = *Blanks;                                                            
+  Endsr;                                                                             
+                                                                                     
+  //---------------------------------------------------------------------            
+  // DspCust - Display custumers subroutine                                          
+  //---------------------------------------------------------------------            
+     BegSr DspCust;                                                                  
+       Chain (EWCOWHD1:EWCOM#D1) EWMSCUST;                                           
+       If %found(EWMSCUST);                                                          
+         EWCOWHW3 = EWCOWH;                                                          
+         EWCOM#W3 = EWCOM#;                                                          
+         EWTPNMW3 = EWTPNM;                                                          
+         EW940W3 = EW940;                                                            
+         EW943W3 = EW943;                                                            
+         EW944W3 = EW944;                                                            
+
+         EW945W3 = EW945;                                                                      
+                                                                                               
+         Dow BackF12 = *off;                                                                   
+           Exfmt EWMDSP;                                                                       
+         EndDo;                                                                                
+         BackF12 = *off;                                                                       
+       EndIf;                                                                                  
+     Endsr;                                                                                    
+                                                                                               
+  //---------------------------------------------------------------------                      
+  // ClrInd - Clear Indicators                                                                 
+  //---------------------------------------------------------------------                      
+     BegSr ClrInd;                                                                             
+       RefreshF5 = *Off ;                                                                      
+       AddF6     = *Off;                                                                       
+       AddF4     = *Off;                                                                       
+       BackF12   = *Off;                                                                       
+       OPT_RV = *Off;                                                                          
+       OPT_PC = *Off;                                                                          
+
+       ErrMsg = *Off;                                                                         
+       ErrMsg2 = *Off;                                                                        
+       Errdltmsg = *Off;                                                                      
+       SFLNXTCHG = *Off;                                                                      
+     Endsr;                                                                                   
+                                                                                              
+  //---------------------------------------------------------------------                     
+  // ClrFld - Clear Variables                                                                 
+  //---------------------------------------------------------------------                     
+     BegSr ClrFld;                                                                            
+       Clear OPTD1;                                                                           
+       Clear DLTFLG;                                                                          
+       Clear DLTFLG2;                                                                         
+       Clear PosFlag;                                                                         
+     EndSr;                                                                                   
+                                                                                              
+  //---------------------------------------------------------------------                     
+  // DltCust Delete confirmation subfile                                                      
+  //---------------------------------------------------------------------                     
+
+    Begsr DltCust;                                                                      
+      ExSr Dlt_Clear;                                                                   
+      ExSr Dlt_Load ;                                                                   
+      ExSr Dlt_Dsply;                                                                   
+    Endsr;                                                                              
+                                                                                        
+  //---------------------------------------------------------------------               
+  // Dlt_Clear- Delete Subfile clear subroutine                                         
+  //---------------------------------------------------------------------               
+     BegSr Dlt_Clear;                                                                   
+       Dlt_DSP = *Off;                                                                  
+       Dlt_CTL = *Off;                                                                  
+       Dlt_CLR = *ON ;                                                                  
+       Dlt_END = *Off;                                                                  
+       RRN# = 0;                                                                        
+       Write DLTSFLCTL;                                                                 
+       Dlt_CTL = *ON ;                                                                  
+       Dlt_CLR = *Off;                                                                  
+       Dlt_END = *ON ;                                                                  
+
+     EndSr ;                                                                         
+                                                                                     
+  //---------------------------------------------------------------------            
+  // Dlt_Load - Delete Subfile Load subroutine                                       
+  //---------------------------------------------------------------------            
+     BegSr Dlt_Load ;                                                                
+       Dlt_DSP = *On;                                                                
+       For i=1 by 1 to DLTCNT+1;                                                     
+         Chain (D_EWCOWH(i):D_EWCOM#(i)) EWMSCUST;                                   
+         If %found(EWMSCUST);                                                        
+           EWCOWHD2 = EWCOWH;                                                        
+           EWCOM#D2 = EWCOM#;                                                        
+           EWTPNMD2 = EWTPNM;                                                        
+           EW940D2 = EW940;                                                          
+           EW943D2 = EW943;                                                          
+           EW944D2 = EW944;                                                          
+           EW945D2 = EW945;                                                          
+           RRN# = RRN#+1;                                                            
+           Write DLTSFL;                                                             
+
+         EndIf;                                                                        
+       EndFor;                                                                         
+                                                                                       
+       If RRN# = 0;                                                                    
+         Dlt_DSP = *Off;                                                               
+       EndIf;                                                                          
+                                                                                       
+     EndSr ;                                                                           
+                                                                                       
+  //---------------------------------------------------------------------              
+  // Dlt_Dsply- Delete Subfile display subroutine                                      
+  //---------------------------------------------------------------------              
+     BegSr Dlt_Dsply;                                                                  
+       Dow BackF12 = *off;                                                             
+         write DltFOOTER;                                                              
+         Exfmt DLTSFLCTL;                                                              
+       IF BackF12 = *on;                                                               
+         Leave;                                                                        
+       Else;                                                                           
+
+         Confirm = 'N';                                                             
+         Exfmt DltCNF;                                                              
+                                                                                    
+         If Confirm = 'N';                                                          
+           Iter;                                                                    
+         EndIf;                                                                     
+                                                                                    
+         For i=1 by 1 to DLTCNT;                                                    
+           Chain (D_EWCOWH(i):D_EWCOM#(i)) EWMSCUST;                                
+           If %found(EWMSCUST);                                                     
+             Delete REWMSCUST;                                                      
+             DLTFLG2 = 1;                                                           
+           EndIf;                                                                   
+         EndFor;                                                                    
+       Leave;                                                                       
+       EndIf;                                                                       
+       EndDo;                                                                       
+       BackF12 = *off;                                                              
+     EndSr ;                                                                        
+
+                                                                                 
+    //------------------------------------------------------------------         
+    // CLR_RI Clear reverse imege                                                
+    //------------------------------------------------------------------         
+                                                                                 
+    Begsr CLR_RI;                                                                
+        RI91 = *Off;                                                             
+        RI92 = *Off;                                                             
+        RI93 = *Off;                                                             
+        RI94 = *Off;                                                             
+        RI95 = *Off;                                                             
+        RI96 = *Off;                                                             
+        RI97 = *Off;                                                             
+        ERRMSGW1 = *Blanks;                                                      
+    Endsr;                                                                       
+                                                                                 
+    //------------------------------------------------------------------         
+    // CLR_FLD Clear variables                                                   
+    //------------------------------------------------------------------         
+                                                                           
+    Begsr CLR_FLD;                                                         
+       EWCOWHW1 = *Blanks;                                                 
+       EWCOM#W1 = *Blanks;                                                 
+       EWTPNMW1 = *Blanks;                                                 
+       EW940W1  = *Blanks;                                                 
+       EW943W1  = *Blanks;                                                 
+       EW944W1  = *Blanks;                                                 
+       EW945W1  = *Blanks;                                                 
+    Endsr;                                                                 
+                                                                           
+  //---------------------------------------------------------------------  
+  // Add New Customer                                                      
+  //---------------------------------------------------------------------  
+  Begsr $Add;                                                              
+        If EWCOWHW1 = *blank;                                              
+           Exsr CLR_RI;                                                    
+           RI91 = *on;                                                     
+           ERRMSGW1 = 'Field cannot be blank';                             
+
+        Elseif EWCOM#W1 = *blank;                                                
+           Exsr CLR_RI;                                                          
+           RI92 = *on ;                                                          
+           ERRMSGW1 = 'Field cannot be blank';                                   
+        Elseif EWTPNMW1 = *blank;                                                
+           Exsr CLR_RI;                                                          
+           RI93 = *on ;                                                          
+           ERRMSGW1 = 'Field cannot be blank';                                   
+        Elseif EW940W1  = *blank;                                                
+           Exsr CLR_RI;                                                          
+           RI94 = *On;                                                           
+           ERRMSGW1 = 'Field cannot be blank';                                   
+        Elseif EW944W1  = *blank;                                                
+           Exsr CLR_RI;                                                          
+           RI95 = *On;                                                           
+           ERRMSGW1 = 'Field cannot be blank';                                   
+        Elseif EW943W1  = *blank;                                                
+           Exsr CLR_RI;                                                          
+           RI96 = *on ;                                                          
+
+           ERRMSGW1 = 'Field cannot be blank';                                
+        Elseif EW945W1  = *blank;                                             
+           Exsr CLR_RI;                                                       
+           RI97 = *on ;                                                       
+           ERRMSGW1 = 'Field cannot be blank';                                
+        Else;                                                                 
+           If EW940W1 <> 'Y' and EW940W1 <> 'N';                              
+              Exsr CLR_RI;                                                    
+              RI94 = *on ;                                                    
+              ERRMSGW1 = 'Either Y or N is allowed';                          
+           ElseIf EW944W1 <> 'Y' and EW944W1 <> 'N';                          
+              Exsr CLR_RI;                                                    
+              RI95 = *on ;                                                    
+              ERRMSGW1 = 'Either Y or N is allowed';                          
+           ElseIf EW943W1 <> 'Y' and EW943W1 <> 'N';                          
+              Exsr CLR_RI;                                                    
+              RI96 = *on ;                                                    
+              ERRMSGW1 = 'Either Y or N is allowed';                          
+           ElseIf EW945W1 <> 'Y' and EW945W1 <> 'N';                          
+
+              Exsr CLR_RI;                                                        
+              RI97 = *on ;                                                        
+              ERRMSGW1 = 'Either Y and N is allowed';                             
+           Else;                                                                  
+              Exsr CLR_RI;                                                        
+              Chain (EWCOWHW1:EWCOM#W1) EWMSCUST;                                 
+              IF %Found();                                                        
+                  RI91 = *on;                                                     
+                  RI92 = *on;                                                     
+                  ERRMSGW1 = 'Customer Already Exits';                            
+              Else;                                                               
+                                                                                  
+                RI91 = *off;                                                      
+                RI92 = *off;                                                      
+                EWCOWH = %Trim(EWCOWHW1);                                         
+                EWCOM# = %Trim(EWCOM#W1);                                         
+                EWTPNM = %Trim(EWTPNMW1);                                         
+                EW940  = %Trim(EW940W1);                                          
+                EW943  = %Trim(EW943W1);                                          
+
+                EW944  = %Trim(EW944W1);                                     
+                EW945  = %trim(EW945W1);                                     
+                If ADDF4 = *On;                                              
+                  ADDF4 = *Off;                                              
+                  Write REWMSCUST;                                           
+                  Exsr CLR_FLD;                                              
+                  ERRMSGW1 = 'Customer Added';                               
+                EndIf;                                                       
+              Endif;                                                         
+           Endif;                                                            
+     Endif;                                                                  
+  Endsr;                                                                     
+                                                                             
+  //---------------------------------------------------------------------    
+  // End- returning program to control                                       
+  //---------------------------------------------------------------------    
+     BegSr End;                                                              
+       *INLR = *On;                                                          
+       Return;                                                               
+    endsr;                                                           
