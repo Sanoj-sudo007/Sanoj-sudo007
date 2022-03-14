@@ -1,0 +1,3 @@
+manupulation  on timestamp:
+adding and substracting months/day/year 
+Syntax: values ADD_MONTHS(cURRENT_TIMESTAMP ,-6) this is for month 
